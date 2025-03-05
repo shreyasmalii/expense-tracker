@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker - Category View</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 1500px;
+        }
+        #viewExpensesLink{
+            margin-right: 2rem;
+        }
+        .table-title {
+            font-size: 24px;
+            width: 20rem;
+            font-weight: bold;
+            color: #343a40;
+        }
+        .category-badge {
+            font-size: 16px;
+            padding: 0.5em 0.75em;
+            border-radius: 12px;
+            background-color: #0d6efd;
+            color: white;
+            margin-right: 10px;
+        }
+        .budget-info {
+            font-size: 16px;
+            color: #6c757d;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center">
+            <h2 class="table-title">
+                Expenses for
+                <span class="category-badge" th:text="${category}">Category</span>
+            </h2>
+
+            <input id="categoryInput" type="hidden" th:value="${category}">
+            <input id="emailInput" type="hidden" th:value="${email}">
+
+            <label>
+                <select id="monthSelect" class="form-select form-select-sm ms-2 me-1" style="width: auto;" >
+                    <option th:each="month : ${months}" th:value="${month}" th:text="${month}" th:selected="${selectedMonth == month}"></option>
+                </select>
+            </label>
+
+            <label for="yearSelect"></label>
+            <select id="yearSelect" class="form-select form-select-sm" style="width: auto;">
+                <option th:each="year : ${years}" th:value="${year}" th:text="${year}" th:selected="${selectedYear == year}"></option>
+            </select>
+            <a id="viewExpensesLink" href="/expense/getExpenses?category=" class="btn btn-secondary ms-3">Find</a>
+
+        </div>
+
+        <div class="d-flex align-items-center">
+            <span class="budget-info">Allocated Budget: <span th:text="${allocatedBudget}"></span></span>
+            <span class="budget-info">Remaining Budget: <span th:text="${remainingBudget}"></span></span>
+            <a th:href="@{/expense/addExpenseForm/{category}/{email}(category=${category}, email=${email})}" class="btn btn-secondary ms-3">Add New Expense</a>
+            <a th:href="@{/budget/add-budget/{category}/{email}(category=${category}, email=${email})}" class="btn btn-secondary ms-2">Allocate New Budget</a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+            <tr>
+                <th>Date</th>
+                <th>Item</th>
+                <th>Amount</th>
+                <th>Payment Method</th>
+                <th>Notes</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="expense : ${expenses}">
+                <td th:text="${expense.date}"/>
+                <td th:text="${expense.item}">Groceries</td>
+                <td th:text="${expense.amount}">45.00</td>
+                <td th:text="${expense.paymentMethod}">Credit Card</td>
+                <td th:text="${expense.note}">Bought</td>
+                <td><a class="btn btn-danger btn-sm" th:href="@{/expense/remove/{id}/{email}(id=${expense.id}, email=${email})}">Delete</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    document.getElementById("monthSelect").addEventListener("change", updateLink);
+    document.getElementById("yearSelect").addEventListener("change", updateLink);
+
+    function updateLink() {
+        var selectedMonth = document.getElementById("monthSelect").value;
+        var selectedYear = document.getElementById("yearSelect").value;
+        var category = document.getElementById("categoryInput").value;
+        var email = document.getElementById("emailInput").value;
+        var link = document.getElementById("viewExpensesLink");
+        link.href = '/expense/getExpenses?email='+email+'&category='+category+'&month=' + selectedMonth + '&year=' + selectedYear;
+    }
+    updateLink();
+</script>
+
+</body>
+</html>
